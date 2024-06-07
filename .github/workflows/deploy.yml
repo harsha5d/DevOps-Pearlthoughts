@@ -36,6 +36,16 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Install dependencies for ecs-deploy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download ecs-deploy script
+        run: |
+          curl -o ecs-deploy https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy
+          chmod +x ecs-deploy
+
       - name: Deploy to ECS
         env:
           AWS_REGION: 'ap-south-1'
@@ -47,4 +57,4 @@ jobs:
           ECR_REGISTRY: '905418412759.dkr.ecr.ap-south-1.amazonaws.com'
           ECR_REPOSITORY: 'hello-world-app'
         run: |
-          ecs-deploy -r $AWS_REGION -c $ECS_CLUSTER -n $ECS_SERVICE -i $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ./ecs-deploy -r $AWS_REGION -c $ECS_CLUSTER -n $ECS_SERVICE -i $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
